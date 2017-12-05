@@ -1,0 +1,13 @@
+Package: GI
+Title: Generation intervals
+Version: 0.0.0.9000
+Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+Description: Correctly handles generation interval distributions for epidemic models.
+Depends: R (>= 3.4.2)
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Author: David Champredon
+Maintainer: 'David Champredon' <david.champredon@gmail.com>
+RoxygenNote: 6.0.1
+Imports: deSolve

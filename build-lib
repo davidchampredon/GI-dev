@@ -1,0 +1,9 @@
+rm -rf GI/*
+rm -rf lib/*
+rmdir lib
+Rscript library-builder.R
+R CMD build GI
+#R CMD check GI
+mkdir ./lib
+R CMD INSTALL -l ./lib GI
+
