@@ -6,6 +6,7 @@ pkg.name <- 'GI'
 desc <- list('Title' = 'Generation intervals',
              'Description'='Correctly handles generation interval distributions for epidemic models.',
              'License' = 'MIT',
+             'Version' = '0.1',
              'Author' = 'David Champredon',
              "Maintainer" ="'David Champredon' <david.champredon@gmail.com>")
 

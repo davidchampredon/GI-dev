@@ -70,8 +70,7 @@ GI.bck.discrete <- function(time.t, g, GI_span, I) {
 	return(gbck)
 }
 
-#' @title Generation interval distribution for the RESuDe epidemic model.
-#' @description  Calculates the forward and backward generation interval distributions for the Renwal Equation with Susceptible Depletion (RESuDe) epidemic model, defined as:
+#' Calculates the forward and backward generation interval distributions for the Renwal Equation with Susceptible Depletion (RESuDe) epidemic model, defined as:
 #' i(t) = R0*(S(t)/N)^{alpha} * exp(-kappa*t) sum_{k=1}^{GI_span} g(k) * i(t-k)
 #' S(t) = max(0; S(t-1) - i(t) )
 #' with S the number of susceptible individuals, i the incidence, N the constant population size. The RESuDe model is specified directly with the intrinsic generation interval distribution, g, but it is not straightforward to calculate the backward and forward generation interval distributions. This function numericaly solves the backward and forward generation interval distributions (see [1] for theoretical framework).
@@ -86,16 +85,13 @@ GI.bck.discrete <- function(time.t, g, GI_span, I) {
 #' @param horizon Numeric.  Time until which the simultion is run. User must make sure it is beyond the end of the epidemic, else the calculation of generation interval distributions may be wrong!
 #' @param pop_size Integer. Constant population size. Default value at 1E4
 #' @param I.init Integer. Initial number of infectious individuals. Default value at 1
-#' @return Returns a named list.
-#' \itemize{
-#' \item{intrinsic:} {Intrinsic generation interval distribution. List composed of two elements: tsi, the time since infection vector and density the associated vector of densities. }
-#' \item{fwd:} {Forward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the densities of the forward generation interval distribution at the requested calendar times.}
-#' \item{bck:} Backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the densities of the backward generation interval distribution at the requested calendar times. 
-#' \item{fwd.mean:} Mean of the forward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the forward generation interval distribution at the requested calendar times.
-#' \item{bck.mean:} Mean of the backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the backward generation interval distribution at the requested calendar times.
-#' \item{incidence:} Incidence modeled from the RESuDe model.
-#' \item{susceptible:} Time series of the number of susceptible individuals modeled from the RESuDe model.
-#' }
+#' @return Returns a list: intrinsic: Intrinsic generation interval distribution. List composed of two elements: tsi, the time since infection vector and density the associated vector of densities. 
+#' fwd	: Forward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the densities of the forward generation interval distribution at the requested calendar times.
+#' bck	: Backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the densities of the backward generation interval distribution at the requested calendar times. 
+#' fwd.mean	: Mean of the forward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the forward generation interval distribution at the requested calendar times.
+#' bck.mean	: Mean of the backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the backward generation interval distribution at the requested calendar times.
+#' incidence	: Incidence modeled from the RESuDe model.
+#' susceptible	: Time series of the number of susceptible individuals modeled from the RESuDe model.
 #' @export
 #' @references [1] Champredon D, Dushoff J. Intrinsic and realized generation intervals in infectious-disease transmission. Proceedings of the Royal Society B: Biological Sciences 2015; 282: 20152026.
 

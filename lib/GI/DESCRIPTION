@@ -1,6 +1,6 @@
 Package: GI
 Title: Generation intervals
-Version: 0.0.0.9000
+Version: 0.1
 Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
 Description: Correctly handles generation interval distributions for epidemic models.
 Depends: R (>= 3.4.2)
@@ -11,4 +11,4 @@ Author: David Champredon
 Maintainer: 'David Champredon' <david.champredon@gmail.com>
 RoxygenNote: 6.0.1
 Imports: deSolve
-Built: R 3.4.2; ; 2017-12-05 22:53:06 UTC; unix
+Built: R 3.4.2; ; 2017-12-05 23:33:03 UTC; unix
