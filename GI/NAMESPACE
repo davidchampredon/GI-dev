@@ -2,4 +2,5 @@
 
 export(GI.resude)
 export(GI.seminr)
+export(gi_ct_fit)
 importFrom(deSolve,lsoda)

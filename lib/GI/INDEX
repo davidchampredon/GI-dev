@@ -18,3 +18,8 @@ GI.seminr               Calculates the intrinsic, forward and backward
                         the three generation interval distributions
                         (intrinsic, backward and forward ones, see [1]
                         for theoretical framework).
+gi_ct_fit               Fit R0 and mean generation interval from
+                        contact tracing data
+nllk                    Negative Log-Likelihood given R0 and mean
+                        generation interval assuming Poisson
+                        observation error from contact tracing data

@@ -86,15 +86,15 @@ GI.bck.discrete <- function(time.t, g, GI_span, I) {
 #' @param horizon Numeric.  Time until which the simultion is run. User must make sure it is beyond the end of the epidemic, else the calculation of generation interval distributions may be wrong!
 #' @param pop_size Integer. Constant population size. Default value at 1E4
 #' @param I.init Integer. Initial number of infectious individuals. Default value at 1
-#' @return Returns a list
+#' @return Returns a named list.
 #' \itemize{
 #' \item{intrinsic:} {Intrinsic generation interval distribution. List composed of two elements: tsi, the time since infection vector and density the associated vector of densities. }
 #' \item{fwd:} {Forward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the densities of the forward generation interval distribution at the requested calendar times.}
-#' bck	: Backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the densities of the backward generation interval distribution at the requested calendar times. 
-#' fwd.mean	: Mean of the forward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the forward generation interval distribution at the requested calendar times.
-#' bck.mean	: Mean of the backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the backward generation interval distribution at the requested calendar times.
-#' incidence	: Incidence modeled from the RESuDe model.
-#' susceptible	: Time series of the number of susceptible individuals modeled from the RESuDe model.
+#' \item{bck:} Backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the densities of the backward generation interval distribution at the requested calendar times. 
+#' \item{fwd.mean:} Mean of the forward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the forward generation interval distribution at the requested calendar times.
+#' \item{bck.mean:} Mean of the backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the backward generation interval distribution at the requested calendar times.
+#' \item{incidence:} Incidence modeled from the RESuDe model.
+#' \item{susceptible:} Time series of the number of susceptible individuals modeled from the RESuDe model.
 #' }
 #' @export
 #' @references [1] Champredon D, Dushoff J. Intrinsic and realized generation intervals in infectious-disease transmission. Proceedings of the Royal Society B: Biological Sciences 2015; 282: 20152026.
@@ -170,13 +170,16 @@ GI.resude <- function(cal.times.fwdbck,
 #' @param horizon Numeric.  Time until which the simultion is run. User must make sure it is beyond the end of the epidemic, else the calculation of generation interval distributions may be wrong!
 #' @param pop_size Integer. Constant population size. Default value at 1E4
 #' @param I.init Integer. Initial proportion of infectious individuals. Default value at 1
-#' @return Returns a list: intrinsic: Intrinsic generation interval distribution. List composed of two elements: tsi, the time since infection vector and density the associated vector of densities. 
-#' fwd	: Forward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the densities of the forward generation interval distribution at the requested calendar times.
-#' bck	: Backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the densities of the backward generation interval distribution at the requested calendar times. 
-#' fwd.mean	: Mean of the forward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the forward generation interval distribution at the requested calendar times.
-#' bck.mean	: Mean of the backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the backward generation interval distribution at the requested calendar times.
-#' incidence	: Incidence modeled from the RESuDe model.
-#' susceptible	: Time series of the number of susceptible individuals modeled from the RESuDe model.
+#' @return Returns a named list.
+#' \itemize{
+#' \item{intrinsic:} {Intrinsic generation interval distribution. List composed of two elements: tsi, the time since infection vector and density the associated vector of densities. }
+#' \item{fwd:} {Forward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the densities of the forward generation interval distribution at the requested calendar times.}
+#' \item{bck:} Backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the densities of the backward generation interval distribution at the requested calendar times. 
+#' \item{fwd.mean:} Mean of the forward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the forward generation interval distribution at the requested calendar times.
+#' \item{bck.mean:} Mean of the backward generation interval distribution. List composed of cal.times.fwdbck elements, each one representing the mean of the backward generation interval distribution at the requested calendar times.
+#' \item{incidence:} Incidence modeled from the SEmInR model.
+#' \item{susceptible:} Time series of the number of susceptible individuals modeled from the SEmInR model.
+#' }
 #' @references [1] Champredon D, Dushoff J. Intrinsic and realized generation intervals in infectious-disease transmission. Proceedings of the Royal Society B: Biological Sciences 2015; 282: 20152026.
 #' @importFrom deSolve lsoda
 #' @export
@@ -191,7 +194,6 @@ GI.seminr <- function(latent_mean,
 					  dt = 0.1,
 					  I.init = 1E-5
 ){
-	
 	# Generation interval distributions have to
 	# be solved numerically for SEmInR models
 	# (no analytical formula). Hence, first simulate
