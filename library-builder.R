@@ -15,7 +15,7 @@ devtools::create(path = pkg.name,
                  description = desc)
 
 # Add source files:
-rfiles <- c('GI.R', 'RESuDe_FCT.R', 'SEmInR_det.R')
+rfiles <- c('GI.R', 'RESuDe_FCT.R', 'SEmInR_det.R', 'ct.R')
 for(i in seq_along(rfiles))
     system(paste0('cp ',rfiles[i],' ',pkg.name,'/R/'),
            intern = TRUE)
