@@ -119,13 +119,12 @@ confidence.threshold = 0.90
 conf.cutoff <- ll.min+ qchisq(confidence.threshold,2)/2
 
 
-filled.contour(x = R0.rng, 
-               y = gimean.rng, 
-               z = M, 
-               nlevels = 30,
-               color.palette = terrain.colors,
-               xlab = 'R0', ylab = 'Mean GI')
-points(x=3,y=3)
+contour(x = R0.rng, 
+        y = gimean.rng, 
+        z = M, 
+        nlevels = 30,
+        # color.palette = terrain.colors,
+        xlab = 'R0', ylab = 'Mean GI')
 points(x = R0.true, y=infectious_mean, 
        cex=2, pch=15, col='red', lwd=3)
 points(x = R0.rng[idx[1]], y = gimean.rng[idx[2]], pch=1, cex=2,lwd=2)
