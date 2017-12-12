@@ -1,4 +1,15 @@
+calc.Eall	calc.Eall
+calc.Iall	calc.Iall
+calc.Jall	calc.Jall
+GI.bck	GI.bck
+GI.bck.discrete	GI.bck.discrete
+gi.distrib	gi.distrib
+GI.fwd	GI.fwd
+GI.fwd.discrete	GI.fwd.discrete
+GI.intrinsic	GI.intrinsic
 GI.resude	GI.resude
 GI.seminr	GI.seminr
 gi_ct_fit	gi_ct_fit
 nllk	nllk
+RESuDe.simulate	RESuDe.simulate
+SEmInR.FX	SEmInR.FX

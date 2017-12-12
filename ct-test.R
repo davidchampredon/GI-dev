@@ -45,8 +45,8 @@ fxd.prm.resude <- list(horizon=hz, alpha=0, kappa=0, GI_span=20,
 
 # Fit (one for each model):
 
-R0.rng     <- seq(1, 6, by=0.25)
-gimean.rng <- seq(2, 8, by=0.5)
+R0.rng     <- seq(1, 6, by=1) #0.25)
+gimean.rng <- seq(2, 8, by=1) #0.5)
 CI <- 0.95
 do.plot <- TRUE
 

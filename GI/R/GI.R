@@ -1,8 +1,16 @@
+### 
+###   GENERATION INTERVAL FUNCTIONS
+###
+###   Author: David Champredon
+###
 
+
+#' Internal function. Calculate intrinsic generation interval distribution.
+#' @param tau Integer. The _index_ of the simulation time (not the time value.)
+#' @param df Dataframe of the epidemic simulation time series.
+#' @return Density of the intrinsic genration interval distribution.
+#' 
 GI.intrinsic <- function(tau, df){
-	
-	# Warning: 'tau' is the _index_ of the simulation time 
-	# (not the value of the time itself!)
 	res <- 0
 	N  <- length(df$time)
 	dt <- df$time[2]-df$time[1]
@@ -12,6 +20,12 @@ GI.intrinsic <- function(tau, df){
 	return(res)
 }
 
+#' Internal function. Calculate the _forward_ generation interval distribution.
+#' @param tau Integer. The _index_ of the simulation time (not the time value.)
+#' @param s Integer. The _index_ of the simulation time (not the time value.)
+#' @param df Dataframe of the epidemic simulation time series.
+#' @return Density of the forward genration interval distribution.
+#' 
 GI.fwd <- function(tau, s, df){
 	
 	# Warning: 'tau' and 's' is the _index_ of the simulation time 
@@ -27,6 +41,12 @@ GI.fwd <- function(tau, s, df){
 	return(res)
 }
 
+#' Internal function. Calculate the _backward_ generation interval distribution.
+#' @param tau Integer. The _index_ of the simulation time (not the time value.)
+#' @param t Integer. The _index_ of the simulation time (not the time value.)
+#' @param df Dataframe of the epidemic simulation time series.
+#' @return Density of the backward genration interval distribution.
+#' 
 GI.bck <- function(tau, t, df){
 	
 	# Warning: 'tau' and 't' is the _index_ of the simulation time 
@@ -46,6 +66,14 @@ GI.bck <- function(tau, t, df){
 	return(res)
 }
 
+
+#' Internal function. Calculate the _forward_ generation interval distribution with discrete times.
+#' @param time.s Integer. Calendar time.
+#' @param g Numerical vector. Intrinsic generation interval distribution.
+#' @param GI_span Maximum value for the intrinsic GI.
+#' @param S Numerical vector. Susceptible time series.
+#' @return Density of the forward genration interval distribution.
+#' 
 GI.fwd.discrete <- function(time.s, g, GI_span, S) {
 	gfwd <- vector()
 	for (tau in 1:GI_span) {
@@ -58,6 +86,13 @@ GI.fwd.discrete <- function(time.s, g, GI_span, S) {
 	return(gfwd)
 }
 
+#' Internal function. Calculate the _backward_ generation interval distribution with discrete times.
+#' @param time.t Integer. Calendar time.
+#' @param g Numerical vector. Intrinsic generation interval distribution.
+#' @param GI_span Maximum value for the intrinsic GI.
+#' @param I Numerical vector. Prevalence time series.
+#' @return Density of the backward genration interval distribution.
+#' 
 GI.bck.discrete <- function(time.t, g, GI_span, I) {
 	gbck <- vector()
 	for (tau in 1:min(GI_span, time.t - 1)) {
@@ -98,7 +133,7 @@ GI.bck.discrete <- function(time.t, g, GI_span, I) {
 #' }
 #' @export
 #' @references [1] Champredon D, Dushoff J. Intrinsic and realized generation intervals in infectious-disease transmission. Proceedings of the Royal Society B: Biological Sciences 2015; 282: 20152026.
-
+#'
 GI.resude <- function(cal.times.fwdbck,
 					  R0,
 					  alpha,
@@ -197,7 +232,7 @@ GI.seminr <- function(latent_mean,
 	# Generation interval distributions have to
 	# be solved numerically for SEmInR models
 	# (no analytical formula). Hence, first simulate
-	# the epidemic, then caluclate generation
+	# the epidemic, then calculate generation
 	# interval distributions.
 	
 	############################
@@ -240,7 +275,7 @@ GI.seminr <- function(latent_mean,
 								  parms = params.SEmInR))
 	SEmInR <- calc.Iall(dat = SEmInR)
 	SEmInR <- calc.Jall(dat = SEmInR)
-	SEmInR <- calc.Yall(dat = SEmInR)
+	
 	# incidence (from solved cumulative incidence)
 	SEmInR$inc <- c(SEmInR$Z[1],diff(SEmInR$Z))
 	
