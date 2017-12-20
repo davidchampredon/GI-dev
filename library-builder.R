@@ -26,7 +26,7 @@ devtools::document(pkg = pkg.name, clean = TRUE)
 # ('Depends' is stronger than 'Imports')
 
 # Import other packages:
-pkg.imports <- c('deSolve')
+pkg.imports <- c('deSolve','bbmle')
 for(i in 1:length(pkg.imports))
     devtools::use_package(package = pkg.imports[i],
                           pkg = pkg.name,

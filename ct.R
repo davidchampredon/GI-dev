@@ -53,6 +53,71 @@ nllk <- function(R0,
     return(-z)
 }
 
+# Plot neg log likelihood surface
+plot_nllk_surf <- function(model.epi, 
+                           CI,
+                           conf.cutoff,
+                           M,
+                           R0.rng, gimean.rng,
+                           R0.best, gimean.best,
+                           R0.ci, gimean.ci) {
+    
+    title <- paste0('Neg. Log-Likelihood Surface (',model.epi,')\n with ',CI*100,'%CI')
+    ylab <- 'Mean intrinsic GI'
+    if(model.epi=='seminr') ylab <- 'Mean infectious period'
+    
+    contour(x = R0.rng, 
+            y = gimean.rng, 
+            z = M, 
+            nlevels = 20,
+            col='grey',
+            main = title,
+            xlab = 'R0', 
+            ylab = ylab,
+            las = 1)
+    
+    # Best point estimate:
+    col.best <- 'red'
+    
+    points(x = R0.best, 
+           y = gimean.best,
+           pch=16, cex=1, col=col.best)
+    segments(x0 = R0.best, 
+             y0 = 0,
+             x1 = R0.best,
+             y1 = gimean.best,
+             col = col.best, lty=2)
+    segments(x0 = 0,
+             y0 = gimean.best,
+             x1 = R0.best,
+             y1 = gimean.best,
+             col = col.best, lty=2)
+    
+    arrows(x0=R0.ci[1], x1=R0.ci[2],
+           y0 = gimean.best, y1 = gimean.best, 
+           angle = 90, length = 0.1,code = 3, 
+           col = col.best,
+           lwd=1.3)
+    
+    arrows(y0=gimean.ci[1], y1=gimean.ci[2],
+           x0 = R0.best, x1 = R0.best, 
+           angle = 90, length = 0.1, code=3,
+           col = col.best,
+           lwd=1.3)
+    
+    # Draw the confidence contour
+    contour(R0.rng,
+            gimean.rng,
+            M,
+            level = conf.cutoff,
+            labels="",
+            col="red",
+            lwd=3, 
+            lty=1,
+            add = TRUE)
+    
+}
+
 
 #' Fit R0 and mean generation interval from contact tracing data
 #' 
@@ -89,6 +154,8 @@ gi_ct_fit <- function(t.obs,
     
     # Retrieve neg log likelihood min
     ll.min <- M[idx]
+    R0.best     <- R0.rng[idx[1]]
+    gimean.best <- gimean.rng[idx[2]]
     
     # Calculate the level on the likelihoof function
     conf.cutoff <- ll.min + qchisq(CI,2)/2
@@ -110,52 +177,19 @@ gi_ct_fit <- function(t.obs,
     
     # Likelihood surface:
     if(do.plot){
-        title <- paste0('Neg. Log-Likelihood Surface (',model.epi,')\n with ',CI*100,'%CI')
-        ylab <- 'Mean intrinsic GI'
-        if(model.epi=='seminr') ylab <- 'Mean infectious period'
         
-        contour(x = R0.rng, 
-                y = gimean.rng, 
-                z = M, 
-                nlevels = 20,
-                col='grey',
-                main = title,
-                xlab = 'R0', 
-                ylab = ylab,
-                las = 1)
+        plot_nllk_surf(model.epi,
+                       CI,
+                       conf.cutoff,
+                       M,
+                       R0.rng,
+                       gimean.rng,
+                       R0.best,
+                       gimean.best,
+                       R0.ci,
+                       gimean.ci)
         
-        # Best point estimate:
         col.best <- 'red'
-        R0.best     <- R0.rng[idx[1]]
-        gimean.best <- gimean.rng[idx[2]]
-        
-        points(x = R0.best, 
-               y = gimean.best,
-               pch=16, cex=3, col=col.best)
-        segments(x0 = R0.best, 
-                 y0 = 0,
-                 x1 = R0.best,
-                 y1 = gimean.best,
-                 col = col.best, lty=2)
-        segments(x0 = 0,
-                 y0 = gimean.best,
-                 x1 = R0.best,
-                 y1 = gimean.best,
-                 col = col.best, lty=2)
-        
-        # Draw the confidence contour
-        contour(R0.rng,
-                gimean.rng,
-                M,
-                level = conf.cutoff,
-                labels="",
-                col="red",
-                lwd=3, 
-                lty=1,
-                add = TRUE)
-        
-        # Plot the fitted GI means:
-        
         if(model.epi=='seminr'){
             im <- 2*(gimean.best - fxd.prm[['latent_mean']])  # gi.mean ~ latent + infectious/2
             im.lo <- 2*(gimean.ci[1] - fxd.prm[['latent_mean']])  # gi.mean ~ latent + infectious/2
@@ -251,3 +285,54 @@ gi_ct_fit <- function(t.obs,
                 gimean.ci = gimean.ci))
     
 }
+
+#' Fit R0 and mean generation interval from contact tracing data
+#' 
+#' @param t.obs Numeric vector. Time when the backward generation intervals were observed
+#' @param gi.obs Numeric vector. Backward generation intervals observed.
+#' @param model.epi String. Epidemic model used. Choice between \code{seminr} or \code{resude}.
+#' @param fxd.prm List. Parameters of \code{model.epi} that are fixed.
+#' @param R0.rng Numeric vector. Values of R0 explored to calculate the likelihood surface.
+#' @param gimean.rng Numeric vector. Values of mean intrinsic GI explored to calculate the likelihood surface.
+#' @param CI Numeric. Confidence interval level. Default = 0.95.
+#' @param do.plot Boolean. Fitting diagnostic plots. Default = TRUE.
+#' @importFrom bbmle mle2 profile confint plot
+#' @export
+gi_ct_fit_mle2 <- function(t.obs, 
+                      gi.obs, 
+                      model.epi, 
+                      fxd.prm,
+                      start.optim,
+                      CI = 0.95,
+                      do.plot = FALSE ) {
+    
+    t1 <- as.numeric(Sys.time())
+    
+    a <- c(list(fxd.prm=fxd.prm), 
+           list(model.epi=model.epi),
+           list(t.obs = t.obs),
+           list(gi.obs = gi.obs))
+    
+    fit.mle2 <- mle2(minuslogl = nllk, 
+                     start = list(R0=start.optim['R0'], 
+                                  gimean=start.optim['gimean']), 
+                     data = a)
+    
+    pmle2 <- profile(fit.mle2)
+    mle.ci <- confint(pmle2, level = CI)
+    if(do.plot) plot(pmle2)
+    
+    t2 <- as.numeric(Sys.time())
+    dt <- round( (t2-t1)/60, 1)
+    msg <- paste('Fit to contact tracing data done in',dt,'minute(s).')
+    message(msg)
+    return(list(R0.best = fit.mle2@coef['R0'],
+                gimean.best = fit.mle2@coef['gimean'],
+                R0.ci = mle.ci['R0',],
+                gimean.ci = mle.ci['gimean',]))
+}
+
+
+
+
+

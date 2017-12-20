@@ -50,6 +50,7 @@ gimean.rng <- seq(2, 8, by=1) #0.5)
 CI <- 0.95
 do.plot <- TRUE
 
+if(0){ # Model SEmInR takes a long time
 gi_ct_fit(t.obs = t.obs,
           gi.obs = gi.obs,
           model.epi = 'seminr',
@@ -58,7 +59,7 @@ gi_ct_fit(t.obs = t.obs,
           gimean.rng = gimean.rng,
           CI = CI,
           do.plot = do.plot)
-
+}
 
 gi_ct_fit(t.obs = t.obs, 
           gi.obs = gi.obs, 
@@ -68,5 +69,15 @@ gi_ct_fit(t.obs = t.obs,
           gimean.rng = gimean.rng,
           CI = CI,
           do.plot = do.plot)
+
+
+gi_ct_fit_mle2(t.obs = t.obs, 
+          gi.obs = gi.obs, 
+          model.epi = 'resude', 
+          fxd.prm = fxd.prm.resude,
+          start.optim = c(R0=2, gimean=2),
+          CI = CI,
+          do.plot = do.plot)
+
 
 message('|=== CT TEST DONE ===|')
