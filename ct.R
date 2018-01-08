@@ -189,6 +189,10 @@ gi_ct_fit <- function(t.obs,
                        R0.ci,
                        gimean.ci)
         
+        # Reorder data, because "GI.resude" expects so:
+        idx2 <- order(t.obs)
+        tt <- t.obs[idx2]
+        
         col.best <- 'red'
         if(model.epi=='seminr'){
             im <- 2*(gimean.best - fxd.prm[['latent_mean']])  # gi.mean ~ latent + infectious/2
@@ -202,30 +206,30 @@ gi_ct_fit <- function(t.obs,
                               R0 = R0.best, 
                               nE = fxd.prm[['nE']], 
                               nI = fxd.prm[['nI']],
-                              cal.times.fwdbck = t.obs,
+                              cal.times.fwdbck = tt,
                               horizon = fxd.prm[['horizon']], 
                               dt = fxd.prm[['dt']])
             
             Gfit.lo <- GI.seminr(latent_mean = fxd.prm[['latent_mean']],
-                              infectious_mean = im.lo, 
-                              R0 = R0.ci[1], 
-                              nE = fxd.prm[['nE']], 
-                              nI = fxd.prm[['nI']],
-                              cal.times.fwdbck = t.obs,
-                              horizon = fxd.prm[['horizon']], 
-                              dt = fxd.prm[['dt']])
+                                 infectious_mean = im.lo, 
+                                 R0 = R0.ci[1], 
+                                 nE = fxd.prm[['nE']], 
+                                 nI = fxd.prm[['nI']],
+                                 cal.times.fwdbck = tt,
+                                 horizon = fxd.prm[['horizon']], 
+                                 dt = fxd.prm[['dt']])
             Gfit.hi <- GI.seminr(latent_mean = fxd.prm[['latent_mean']],
                                  infectious_mean = im.hi, 
                                  R0 = R0.ci[2], 
                                  nE = fxd.prm[['nE']], 
                                  nI = fxd.prm[['nI']],
-                                 cal.times.fwdbck = t.obs,
+                                 cal.times.fwdbck = tt,
                                  horizon = fxd.prm[['horizon']], 
                                  dt = fxd.prm[['dt']])
             
         }
         if(model.epi=='resude'){
-            Gfit <- GI.resude(cal.times.fwdbck = t.obs,
+            Gfit <- GI.resude(cal.times.fwdbck = tt, 
                               R0 = R0.best,
                               alpha = fxd.prm[['alpha']], 
                               kappa = fxd.prm[['kappa']], 
@@ -234,16 +238,16 @@ gi_ct_fit <- function(t.obs,
                               GI_var = fxd.prm[['GI_var']], 
                               GI_type = fxd.prm[['GI_type']],
                               horizon = fxd.prm[['horizon']])
-            Gfit.lo <- GI.resude(cal.times.fwdbck = t.obs,
-                              R0 = R0.ci[1],
-                              alpha = fxd.prm[['alpha']], 
-                              kappa = fxd.prm[['kappa']], 
-                              GI_span = fxd.prm[['GI_span']], 
-                              GI_mean = gimean.ci[1], 
-                              GI_var = fxd.prm[['GI_var']], 
-                              GI_type = fxd.prm[['GI_type']],
-                              horizon = fxd.prm[['horizon']])
-            Gfit.hi <- GI.resude(cal.times.fwdbck = t.obs,
+            Gfit.lo <- GI.resude(cal.times.fwdbck = tt, 
+                                 R0 = R0.ci[1],
+                                 alpha = fxd.prm[['alpha']], 
+                                 kappa = fxd.prm[['kappa']], 
+                                 GI_span = fxd.prm[['GI_span']], 
+                                 GI_mean = gimean.ci[1], 
+                                 GI_var = fxd.prm[['GI_var']], 
+                                 GI_type = fxd.prm[['GI_type']],
+                                 horizon = fxd.prm[['horizon']])
+            Gfit.hi <- GI.resude(cal.times.fwdbck = tt, 
                                  R0 = R0.ci[2],
                                  alpha = fxd.prm[['alpha']], 
                                  kappa = fxd.prm[['kappa']], 
@@ -258,7 +262,7 @@ gi_ct_fit <- function(t.obs,
         gbck.fit.lo <- Gfit.lo$bck.mean
         gbck.fit.hi <- Gfit.hi$bck.mean
         
-        plot(x = t.obs, 
+        plot(x = tt, 
              y = gbck.fit, 
              ylim = range(gbck.fit,gi.obs),
              typ='o', pch=16, lwd=3,
@@ -267,13 +271,15 @@ gi_ct_fit <- function(t.obs,
              xlab = 'calendar time',
              ylab='Mean Backward GI',
              main = paste(model.epi, 'model backward GI\nfitted to contact tracing data'))
-        lines(x=t.obs, y=gbck.fit.lo, lty=2, col=col.best, lwd=2)
-        lines(x=t.obs, y=gbck.fit.hi, lty=2, col=col.best, lwd=2)
-        points(t.obs, gi.obs, pch=1, col='black',lwd=1.5,cex=1)
+        
+        
+        lines(x=tt, y=gbck.fit.lo, lty=2, col=col.best, lwd=2)
+        lines(x=tt, y=gbck.fit.hi, lty=2, col=col.best, lwd=2)
+        points(t.obs, gi.obs, pch=1, col=rgb(0,0,0,0.7),lwd=2,cex=1)
         grid()
         legend('topleft', legend = c('data','model fit',paste(CI*100,'%CI')),
                col=c('black',col.best,col.best),pch=c(1,16,NA),lwd=c(NA,3,2),
-               pt.cex = c(1,1,NA), pt.lwd = c(1.5,1,NA), lty=c(1,1,2))
+               pt.cex = c(1,1,NA), pt.lwd = c(2,1,NA), lty=c(1,1,2))
     }
     t2 <- as.numeric(Sys.time())
     dt <- round( (t2-t1)/60, 1)
