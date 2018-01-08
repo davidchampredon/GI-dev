@@ -99,9 +99,9 @@ fxd.prm.resude <- list(horizon=horizon, alpha=0, kappa=0,
                        GI_type='pois', 
                        dt=1.0)
 
-R0.rng     <- seq(1, 6, by=0.25)
-gimean.rng <- seq(2, 8, by=0.5)
-CI <- 0.80
+R0.rng     <- seq(1, 6, by=0.2)
+gimean.rng <- seq(2, 8, by=0.2)
+CI <- 0.95
 do.plot <- TRUE
 
 if(FALSE){ # Takes too much time... 
