@@ -5,7 +5,7 @@
 cp GI/R/*.R ../GI/R
 
 ### C++ source files:
-cp GI/src/* ../GI/src
+#cp GI/src/* ../GI/src
 
 ### Documentation:
 cp GI/man/* ../GI/man
