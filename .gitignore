@@ -1,3 +1,4 @@
 *.rds
 *.rdb
 *.Rd
+vignettes/GI-vignette.html
