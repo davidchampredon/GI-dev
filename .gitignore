@@ -1,4 +1,6 @@
 *.rds
 *.rdb
 *.Rd
-vignettes/GI-vignette.html
+*.gz
+vignettes/*html*
+

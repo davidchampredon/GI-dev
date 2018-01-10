@@ -46,6 +46,8 @@ gi.distrib              Internal function. Discrete generation interval
                         distribution.
 gi_ct_fit               Fit R0 and mean generation interval from
                         contact tracing data
+gi_ct_fit_mle2          Fit R0 and mean generation interval from
+                        contact tracing data
 nllk                    Negative Log-Likelihood given R0 and mean
                         generation interval assuming Poisson
                         observation error from contact tracing data

@@ -10,6 +10,7 @@ GI.intrinsic	GI.intrinsic
 GI.resude	GI.resude
 GI.seminr	GI.seminr
 gi_ct_fit	gi_ct_fit
+gi_ct_fit_mle2	gi_ct_fit_mle2
 nllk	nllk
 RESuDe.simulate	RESuDe.simulate
 SEmInR.FX	SEmInR.FX
