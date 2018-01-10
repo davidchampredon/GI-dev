@@ -10,4 +10,5 @@ LazyData: true
 Author: David Champredon
 Maintainer: 'David Champredon' <david.champredon@gmail.com>
 RoxygenNote: 6.0.1
-Imports: deSolve
+Imports: deSolve,
+    bbmle
