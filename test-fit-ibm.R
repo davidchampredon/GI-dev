@@ -36,6 +36,8 @@ doExact         <- FALSE
 timeStepTauLeap <- 0.1
 rnd_seed        <- 1234
 
+target.val <- c(R0, latent_mean+infectious_mean/2)
+
 # See: ?seminribm_run
 sim <- seminribm_run(horizon,
                      popSize ,
@@ -61,14 +63,14 @@ at <- sim$acq_times
 # - there is an observation error
 
 # Sample the GIs observed:
-prop.observed <- 0.1  # proportion of GIs observed
-n.obs <- round(prop.observed*popSize)  # number of bckwd GIs observed
+prop.observed <- 0.99  # proportion of GIs observed
+n.obs <- min(length(b), round(prop.observed*popSize) ) # number of bckwd GIs observed
 idx.obs <- sample(x = 1:length(b), size = n.obs, replace = FALSE)
 gi.obs.true <- b[idx.obs]
 at.obs <- at[idx.obs]
 
 # Add observation error:
-sd.err <- 0.5
+sd.err <- 0.01
 gi.obs <- rnorm(n = n.obs, mean = gi.obs.true, sd = sd.err)
 gi.obs[gi.obs<1] <- 1
 gi.obs <- round(gi.obs)
@@ -104,7 +106,7 @@ fxd.prm.resude <- list(horizon=horizon,
                        alpha=0, 
                        kappa=0, 
                        GI_span = 20, 
-                       GI_var = NULL, 
+                       GI_var = 5, 
                        GI_type = 'pois', 
                        dt = 1.0)
 
@@ -123,8 +125,12 @@ fit.resude <- gi_ct_fit(t.obs = at.obs,
                         CI = CI,
                         do.plot = do.plot)
 
-
-
-
-
+library(bbmle)
+fr2 <- gi_ct_fit_mle2(t.obs = at.obs, 
+                      gi.obs = gi.obs, 
+                      model.epi = 'resude', 
+                      fxd.prm = fxd.prm.resude,
+                      start.optim = c(R0=2,  gimean=5), 
+                      CI = CI,
+                      do.plot = FALSE)
 
