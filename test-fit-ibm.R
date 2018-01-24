@@ -6,9 +6,9 @@ library(devtools)
 # Load (and download if needed) my libraries
 lib.GI <- try(library(GI))
 if(class(lib.GI)=='try-error'){
-install_github("davidchampredon/GI", 
-               build_vignettes = FALSE, force=TRUE)
-library(GI)
+    install_github("davidchampredon/GI", 
+                   build_vignettes = FALSE, force=TRUE)
+    library(GI)
 }
 
 lib.seminribm <- try(library(seminribm))
@@ -124,13 +124,14 @@ fit.resude <- gi_ct_fit(t.obs = at.obs,
                         gimean.rng = gimean.rng,
                         CI = CI,
                         do.plot = do.plot)
-
-library(bbmle)
-fr2 <- gi_ct_fit_mle2(t.obs = at.obs, 
-                      gi.obs = gi.obs, 
-                      model.epi = 'resude', 
-                      fxd.prm = fxd.prm.resude,
-                      start.optim = c(R0=2,  gimean=5), 
-                      CI = CI,
-                      do.plot = FALSE)
-
+if(0){
+    library(bbmle)
+    fr2 <- gi_ct_fit_mle2(t.obs = at.obs, 
+                          gi.obs = gi.obs, 
+                          model.epi = 'resude', 
+                          fxd.prm = fxd.prm.resude,
+                          start.optim = c(R0=2,  gimean=5), 
+                          CI = CI,
+                          do.plot = FALSE)
+    
+}
