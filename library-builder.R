@@ -32,7 +32,7 @@ for(i in 1:length(pkg.imports))
                           pkg = pkg.name,
                           type = 'Imports')
 # Dependencies on other packages:
-pkg.dep <- NULL #c('snow', 'snowfall')  # <-- need this bc of unsolved issue with 'snow': https://stackoverflow.com/questions/36284643/importing-snowfall-into-custom-r-package
+pkg.dep <- c('snow', 'snowfall')  # <-- need this bc of unsolved issue with 'snow': https://stackoverflow.com/questions/36284643/importing-snowfall-into-custom-r-package
 for(i in seq_along(pkg.dep))
     devtools::use_package(package = pkg.dep[i],
                           pkg = pkg.name,

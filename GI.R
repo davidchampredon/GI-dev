@@ -212,6 +212,7 @@ GI.resude <- function(cal.times.fwdbck,
 #' @param horizon Numeric.  Time until which the simultion is run. User must make sure it is beyond the end of the epidemic, else the calculation of generation interval distributions may be wrong!
 #' @param pop_size Integer. Constant population size. Default value at 1E4
 #' @param I.init Integer. Initial proportion of infectious individuals. Default value at 1
+#' @param calc.fwd Boolean. Is the forward GI calculated?. Default value \code{TRUE}.
 #' @return Returns a named list.
 #' \itemize{
 #' \item{intrinsic:} {Intrinsic generation interval distribution. List composed of two elements: tsi, the time since infection vector and density the associated vector of densities. }
@@ -234,7 +235,8 @@ GI.seminr <- function(latent_mean,
 					  cal.times.fwdbck,
 					  horizon,
 					  dt = 0.1,
-					  I.init = 1E-5
+					  I.init = 1E-5,
+					  calc.fwd = TRUE
 ){
 	# Generation interval distributions have to
 	# be solved numerically for SEmInR models
@@ -327,11 +329,16 @@ GI.seminr <- function(latent_mean,
 		
 		# calculate gi.fwd:
 		gi.fwd <- vector()
-		for(tau in 1:(NT-s)) { gi.fwd[tau] <- GI.fwd(tau, s, SEmInR) }
-		# calculate expectation of gi.fwd:
-		tt[cnt] <- SEmInR$time[s]
-		tvec <- SEmInR$time[c(1:(NT-s))]
-		f.bar[cnt] <- sum(gi.fwd*tvec*dt)
+		if(calc.fwd) {
+		    for(tau in 1:(NT-s)) { 
+		        gi.fwd[tau] <- GI.fwd(tau, s, SEmInR) 
+		    }
+		    
+		    # calculate expectation of gi.fwd:
+		    tt[cnt] <- SEmInR$time[s]
+		    tvec <- SEmInR$time[c(1:(NT-s))]
+		    f.bar[cnt] <- sum(gi.fwd*tvec*dt)
+		}
 		
 		# calculate gi.bck:
 		gi.bck <- vector()

@@ -9,7 +9,7 @@
 #' @param gi.obs Numeric vector. Backward generation intervals observed.
 #' @param model.epi String. Epidemic model used. Choice between \code{seminr} or \code{resude}.
 #' @param fxd.prm List. Parameters of \code{model.epi} that are fixed.
-#' 
+#' @export
 nllk <- function(R0, 
                  gimean,
                  t.obs, 
@@ -17,11 +17,13 @@ nllk <- function(R0,
                  model.epi, 
                  fxd.prm) {
     
-    message(paste0('Evaluating NLLK R0=',R0, ' gimaen=',gimean,'...'))
+    message(paste0('Evaluating likelihood R0=',R0, ' gimean=',gimean,' ...'),
+            appendLF = FALSE)
     
     if(model.epi=='seminr'){
-        
-        im <- 2*(gimean - fxd.prm[['latent_mean']])  # gi.mean ~ latent + infectious/2
+        nI = fxd.prm[['nI']]
+        # gi.mean ~ latent + infectious*(n+1)/(2n)
+        im <- 2*nI / (nI+1) *(gimean - fxd.prm[['latent_mean']])  
         if(im <= 0){
             warning('GI and latent period lengths not consistent!')
             im <- 1
@@ -33,7 +35,8 @@ nllk <- function(R0,
                        nI = fxd.prm[['nI']],
                        cal.times.fwdbck = t.obs,
                        horizon = fxd.prm[['horizon']], 
-                       dt = fxd.prm[['dt']])
+                       dt = fxd.prm[['dt']],
+                       calc.fwd = FALSE)
     }
     if(model.epi=='resude'){
         G <- GI.resude(cal.times.fwdbck = t.obs,
@@ -51,8 +54,11 @@ nllk <- function(R0,
     b[b==0] <- 1e-6
     
     # Calculate log likelihood:
-    z <- sum(dpois(x = gi.obs, lambda = b, log = TRUE))
-    return(-z)
+    # tmp <- dpois(x = gi.obs, lambda = b, log = TRUE)
+    # gi.obs[which(is.na(tmp))]
+    z <- -sum(dpois(x = gi.obs, lambda = b, log = TRUE), na.rm = TRUE)
+    message(paste0(' nllk = ', z))
+    return(z)
 }
 
 # Plot neg log likelihood surface
@@ -147,13 +153,34 @@ gi_ct_fit <- function(t.obs,
     
     t1 <- as.numeric(Sys.time())
     
-    M <- outer(X = R0.rng, 
-               Y = gimean.rng, 
-               FUN = Vectorize(nllk, list("R0","gimean")), 
-               t.obs = t.obs, 
-               gi.obs = gi.obs, 
-               model.epi = model.epi, 
-               fxd.prm = fxd.prm)
+    # M <- outer(X = R0.rng, 
+    #            Y = gimean.rng, 
+    #            FUN = Vectorize(nllk, list("R0","gimean")), 
+    #            t.obs = t.obs, 
+    #            gi.obs = gi.obs, 
+    #            model.epi = model.epi, 
+    #            fxd.prm = fxd.prm)
+    
+    ncpus <- parallel::detectCores()
+    
+    sfInit(parallel = ncpus>1, cpus = ncpus)
+    
+    nllk_R0 <- function(R0,gimean,t.obs, gi.obs, model.epi, fxd.prm) {
+        a <- nllk(R0,gimean,t.obs, gi.obs, model.epi, fxd.prm)
+    }
+    sfLibrary(GI, lib.loc = './lib')
+    sfExportAll()
+    x <- list()
+    for(i in 1:length(gimean.rng)){
+        x[[i]] <- sfSapply(R0.rng,
+                 fun = nllk_R0,
+                 gimean = gimean.rng[i],
+                 t.obs, gi.obs, 
+                 model.epi, fxd.prm)
+    }
+    sfStop()
+    
+    M <- do.call(cbind, x)
     
     idx <- which(M == min(M, na.rm = TRUE), 
                  arr.ind = TRUE)
@@ -206,12 +233,14 @@ gi_ct_fit <- function(t.obs,
         
         col.best <- 'red'
         if(model.epi=='seminr'){
-            im <- 2*(gimean.best - fxd.prm[['latent_mean']])  # gi.mean ~ latent + infectious/2
-            im.lo <- 2*(gimean.ci[1] - fxd.prm[['latent_mean']])  # gi.mean ~ latent + infectious/2
-            im.hi <- 2*(gimean.ci[2] - fxd.prm[['latent_mean']])  # gi.mean ~ latent + infectious/2
+            im    <- 2*nI / (nI+1) *(gimean.best - fxd.prm[['latent_mean']])  # gi.mean ~ latent + infectious * (nI+1)/2/nI
+            im.lo <- 2*nI / (nI+1) *(gimean.ci[1] - fxd.prm[['latent_mean']])  
+            im.hi <- 2*nI / (nI+1) *(gimean.ci[2] - fxd.prm[['latent_mean']])  
+            
             if(im <= 0) im <- 1
             if(im.lo <= 0) im.lo <- 1
             if(im.hi <= 0) im.hi <- 1
+            
             Gfit <- GI.seminr(latent_mean = fxd.prm[['latent_mean']],
                               infectious_mean = im, 
                               R0 = R0.best, 
@@ -219,7 +248,8 @@ gi_ct_fit <- function(t.obs,
                               nI = fxd.prm[['nI']],
                               cal.times.fwdbck = tt,
                               horizon = fxd.prm[['horizon']], 
-                              dt = fxd.prm[['dt']])
+                              dt = fxd.prm[['dt']],
+                              calc.fwd = FALSE)
             
             Gfit.lo <- GI.seminr(latent_mean = fxd.prm[['latent_mean']],
                                  infectious_mean = im.lo, 
@@ -228,7 +258,8 @@ gi_ct_fit <- function(t.obs,
                                  nI = fxd.prm[['nI']],
                                  cal.times.fwdbck = tt,
                                  horizon = fxd.prm[['horizon']], 
-                                 dt = fxd.prm[['dt']])
+                                 dt = fxd.prm[['dt']],
+                                 calc.fwd = FALSE)
             Gfit.hi <- GI.seminr(latent_mean = fxd.prm[['latent_mean']],
                                  infectious_mean = im.hi, 
                                  R0 = R0.ci[2], 
@@ -236,7 +267,8 @@ gi_ct_fit <- function(t.obs,
                                  nI = fxd.prm[['nI']],
                                  cal.times.fwdbck = tt,
                                  horizon = fxd.prm[['horizon']], 
-                                 dt = fxd.prm[['dt']])
+                                 dt = fxd.prm[['dt']],
+                                 calc.fwd = FALSE)
             
         }
         if(model.epi=='resude'){
@@ -275,7 +307,7 @@ gi_ct_fit <- function(t.obs,
         
         plot(x = tt, 
              y = gbck.fit, 
-             ylim = range(gbck.fit,gi.obs),
+             ylim = range(gbck.fit,gi.obs, na.rm = TRUE),
              typ='o', pch=16, lwd=3,
              col = col.best,
              las = 1, 
@@ -333,7 +365,8 @@ gi_ct_fit_mle2 <- function(t.obs,
     fit.mle2 <- mle2(minuslogl = nllk, 
                      start = list(R0=start.optim['R0'], 
                                   gimean=start.optim['gimean']), 
-                     data = a)
+                     data = a,
+                     control = list(ndeps=c(0.01,0.02)))
     
     pmle2 <- profile(fit.mle2)
     mle.ci <- confint(pmle2, level = CI)
