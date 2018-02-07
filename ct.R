@@ -17,6 +17,8 @@ nllk <- function(R0,
                  model.epi, 
                  fxd.prm) {
     
+    message(paste0('Evaluating NLLK R0=',R0, ' gimaen=',gimean,'...'))
+    
     if(model.epi=='seminr'){
         
         im <- 2*(gimean - fxd.prm[['latent_mean']])  # gi.mean ~ latent + infectious/2

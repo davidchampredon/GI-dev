@@ -1,7 +1,11 @@
+
+# ---- Libraries ----
 library(tidyr)
 library(dplyr)
 library(ggplot2) ; theme_set(theme_bw())
 library(devtools) 
+
+
 
 # Load (and download if needed) my libraries
 lib.GI <- try(library(GI))
@@ -29,8 +33,8 @@ initInfectious  <- 2
 R0              <- 3.0
 latent_mean     <- 2
 infectious_mean <- 4
-nE              <- 6
-nI              <- 6
+nE              <- 1
+nI              <- 1
 calc_WIW_Re     <- FALSE
 doExact         <- FALSE
 timeStepTauLeap <- 0.1
@@ -110,13 +114,22 @@ fxd.prm.resude <- list(horizon=horizon,
                        GI_type = 'pois', 
                        dt = 1.0)
 
-R0.rng     <- seq(1, 6, by=0.5)
-gimean.rng <- seq(2, 8, by=0.5)
+
+fxd.prm.seminr <- list(horizon=horizon, 
+                       nE=nE, 
+                       nI=nI, 
+                       latent_mean=latent_mean, 
+                       dt = 1.0)
+
+
+R0.rng     <- seq(1, 6, by=1)
+gimean.rng <- seq(2, 8, by=1)
 CI <- 0.95
 do.plot <- TRUE
 
 # See: ?gi_ct_fit
-fit.resude <- gi_ct_fit(t.obs = at.obs, 
+if(FALSE){
+    fit.resude <- gi_ct_fit(t.obs = at.obs, 
                         gi.obs = gi.obs, 
                         model.epi = 'resude', 
                         fxd.prm = fxd.prm.resude,
@@ -124,6 +137,21 @@ fit.resude <- gi_ct_fit(t.obs = at.obs,
                         gimean.rng = gimean.rng,
                         CI = CI,
                         do.plot = do.plot)
+}
+
+
+if(FALSE){ # Takes too much time... 
+    fit.seminr <- gi_ct_fit(t.obs = at.obs,
+                            gi.obs = gi.obs,
+                            model.epi = 'seminr',
+                            fxd.prm = fxd.prm.seminr,
+                            R0.rng = R0.rng,
+                            gimean.rng = gimean.rng,
+                            CI = CI,
+                            do.plot = do.plot)
+}
+
+
 if(0){
     library(bbmle)
     fr2 <- gi_ct_fit_mle2(t.obs = at.obs, 
